@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Кафе "Три Бобра"{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4">Добро пожаловать в кафе "Три Бобра"!</h1>
+    <p class="lead">Уютное кафе с домашней кухней и атмосферой лесного домика</p>
+    <a href="{{ url_for('menu.menu_list') }}" class="btn btn-danger btn-lg">Смотреть меню</a>
+    <a href="{{ url_for('booking.book_table') }}" class="btn btn-outline-danger btn-lg">Забронировать столик</a>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3>🍲 Домашняя кухня</h3>
+                <p>Только свежие продукты и рецепты, проверенные временем</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3>🪵 Уютный интерьер</h3>
+                <p>Деревянная мебель, камин и живая музыка по вечерам</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3>🚗 Доставка</h3>
+                <p>Быстрая доставка по городу. Отслеживайте заказ на карте!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <h2>Популярные блюда</h2>
+    <p>Загружаются из меню...</p>
+</div>
+{% endblock %}
