@@ -20,7 +20,7 @@
         </div>
         <div class="col-lg-6 text-center">
             <div class="hero-image">
-                <span style="font-size: 200px;">🦫🏠☕</span>
+                <span style="font-size: 200px;">🐿🏠☕</span>
             </div>
         </div>
     </div>
@@ -59,46 +59,27 @@
     <!-- Популярные блюда -->
     <h2 class="text-center mb-4">Популярные блюда</h2>
     <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename='images/menu/default-food.jpg') }}" class="card-img-top" alt="Стейк из лосося" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Стейк из лосося</h5>
-                    <p class="text-muted">С овощами гриль</p>
-                    <p class="fw-bold text-primary">1 200 ₽</p>
+        {% if popular_items %}
+            {% for item in popular_items %}
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ url_for('static', filename='images/menu/' + item.image_url) }}" 
+                         class="card-img-top" alt="{{ item.name }}" 
+                         style="height: 200px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <span class="badge bg-secondary mb-2">{{ item.category.name }}</span>
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="text-muted small">{{ item.description[:60] }}{% if item.description|length > 60 %}...{% endif %}</p>
+                        <p class="fw-bold text-primary">{{ item.price }} ₽</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename='images/menu/default-food.jpg') }}" class="card-img-top" alt="Паста Карбонара" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Паста Карбонара</h5>
-                    <p class="text-muted">С беконом и пармезаном</p>
-                    <p class="fw-bold text-primary">850 ₽</p>
-                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-3">
+                <p class="text-muted">Пока нет доступных блюд</p>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename='images/menu/default-food.jpg') }}" class="card-img-top" alt="Цезарь с курицей" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Цезарь с курицей</h5>
-                    <p class="text-muted">Классический рецепт</p>
-                    <p class="fw-bold text-primary">650 ₽</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename='images/menu/default-food.jpg') }}" class="card-img-top" alt="Чизкейк Нью-Йорк" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Чизкейк Нью-Йорк</h5>
-                    <p class="text-muted">С ягодным соусом</p>
-                    <p class="fw-bold text-primary">450 ₽</p>
-                </div>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

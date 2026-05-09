@@ -6,6 +6,71 @@
 <div class="container">
     <h1 class="mb-4">Мои бронирования</h1>
     
+    {% if bookings %}
+    <div class="row">
+        {% for booking in bookings %}
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm 
+                {% if booking.status == 'pending' %}border-warning
+                {% elif booking.status == 'confirmed' %}border-success
+                {% elif booking.status == 'completed' %}border-secondary
+                {% elif booking.status == 'cancelled' %}border-danger
+                {% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>Бронь #{{ booking.id }}</strong>
+                    <span class="badge 
+                        {% if booking.status == 'pending' %}bg-warning
+                        {% elif booking.status == 'confirmed' %}bg-success
+                        {% elif booking.status == 'completed' %}bg-secondary
+                        {% elif booking.status == 'cancelled' %}bg-danger
+                        {% endif %}">
+                        {% if booking.status == 'pending' %}Ожидает
+                        {% elif booking.status == 'confirmed' %}Подтверждена
+                        {% elif booking.status == 'completed' %}Завершена
+                        {% elif booking.status == 'cancelled' %}Отменена
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Дата:</small>
+                            <p class="mb-1"><strong>{{ booking.date.strftime('%d.%m.%Y') }}</strong></p>
+                            
+                            <small class="text-muted">Время:</small>
+                            <p class="mb-1"><strong>{{ booking.time_from.strftime('%H:%M') }} – {{ booking.time_to.strftime('%H:%M') }}</strong></p>
+                            
+                            <small class="text-muted">Телефон:</small>
+                            <p class="mb-1"><strong>{{ booking.phone }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Столик:</small>
+                            <p class="mb-1"><strong>№{{ booking.table_number }}</strong></p>
+                            
+                            {% if booking.table_number in tables %}
+                            <small class="text-muted">Расположение:</small>
+                            <p class="mb-1"><strong>{{ tables[booking.table_number].location }}</strong></p>
+                            
+                            <small class="text-muted">Мест:</small>
+                            <p class="mb-1"><strong>{{ tables[booking.table_number].seats }}</strong></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if booking.special_requests %}
+                    <hr>
+                    <small class="text-muted">Пожелания:</small>
+                    <p class="mb-0">{{ booking.special_requests }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-muted small">
+                    Забронировано {{ booking.created_at.strftime('%d.%m.%Y в %H:%M') }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
     <div class="card shadow-sm">
         <div class="card-body text-center py-5">
             <span style="font-size: 80px;">🗓️</span>
@@ -16,5 +81,6 @@
             </a>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -117,3 +117,38 @@ main {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--beaver-dark);
 }
+
+/* Анимация добавления в корзину */
+.add-to-cart-ajax.btn-success {
+    transition: all 0.3s ease;
+}
+
+.nav-link.position-relative {
+    position: relative;
+    padding-right: 25px;
+}
+
+/* Бейдж корзины */
+#cart-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 2px 7px;
+    font-size: 0.7rem;
+    line-height: 1;
+    border-radius: 50px;
+    flex-shrink: 0;
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+/* Если бейдж скрыт — даём Bootstrap'овскому .d-none приоритет */
+#cart-count.d-none {
+    display: none !important;
+}
+
+a.nav-link.d-flex {
+    white-space: nowrap;
+}

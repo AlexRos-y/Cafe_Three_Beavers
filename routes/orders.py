@@ -15,6 +15,7 @@ def order():
         return redirect(url_for('cart.cart'))
     
     total = sum(item.menu_item.price * item.quantity for item in cart_items)
+    cart_count = sum(item.quantity for item in cart_items)
     
     if request.method == 'POST':
         delivery_address = request.form.get('delivery_address')
@@ -23,9 +24,8 @@ def order():
         
         if not delivery_address:
             flash('Укажите адрес доставки!', 'danger')
-            return render_template('order.html', cart_items=cart_items, total=total)
+            return render_template('order.html', cart_items=cart_items, total=total, cart_count=cart_count)
         
-        # Создаём заказ
         order = Order(
             user_id=current_user.id,
             total_price=total,
@@ -36,9 +36,8 @@ def order():
             created_at=datetime.utcnow()
         )
         db.session.add(order)
-        db.session.flush()  # Получаем order.id до коммита
+        db.session.flush()
         
-        # Переносим товары из корзины в заказ
         for cart_item in cart_items:
             order_item = OrderItem(
                 order_id=order.id,
@@ -48,18 +47,17 @@ def order():
             )
             db.session.add(order_item)
         
-        # Очищаем корзину
         CartItem.query.filter_by(user_id=current_user.id).delete()
-        
         db.session.commit()
         
         flash('Заказ успешно оформлен! Ожидайте доставку.', 'success')
         return redirect(url_for('orders.orders'))
     
-    return render_template('order.html', cart_items=cart_items, total=total)
+    return render_template('order.html', cart_items=cart_items, total=total, cart_count=cart_count)
 
 @orders_bp.route('/orders')
 @login_required
 def orders():
-    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
-    return render_template('orders.html', orders=orders)
+    user_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    cart_count = sum(item.quantity for item in current_user.cart_items)
+    return render_template('orders.html', orders=user_orders, cart_count=cart_count)

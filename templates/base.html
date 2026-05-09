@@ -4,21 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Three Beavers Cafe{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Свой CSS -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Навигация -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark-green sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2" onerror="this.style.display='none'">
-                Three Beavers Cafe
+                🐿 Кафе "Три бобра"
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -40,26 +35,49 @@
                             <i class="bi bi-calendar-check"></i> Бронь столика
                         </a>
                     </li>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                            <i class="bi bi-shield-lock"></i> Админка
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cart.cart') }}">
-                            <i class="bi bi-cart"></i> Корзина
-                            <span id="cart-count" class="badge bg-warning text-dark">0</span>
+                        <a class="nav-link d-flex align-items-center gap-1" href="{{ url_for('cart.cart') }}">
+                            <i class="bi bi-cart2"></i> Корзина
+                            <span id="cart-count" class="badge bg-warning text-dark {% if cart_count == 0 %}d-none{% endif %}">
+                                {{ cart_count }}
+                            </span>
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <img src="/auth/avatar/{{ current_user.id }}"
+                                 class="rounded-circle me-2"
+                                 style="width: 24px; height: 24px; object-fit: cover;"
+                                 alt="">
+                            {{ current_user.username }}
+                            {% if current_user.is_admin %}<span class="badge bg-danger ms-1">admin</span>{% endif %}
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
+                                <i class="bi bi-person"></i> Мой профиль
+                            </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('orders.orders') }}">
                                 <i class="bi bi-bag"></i> Мои заказы
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('booking.my_bookings') }}">
                                 <i class="bi bi-calendar"></i> Мои брони
                             </a></li>
+                            {% if current_user.is_admin %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}">
+                                <i class="bi bi-shield-lock"></i> Админ-панель
+                            </a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
                                 <i class="bi bi-box-arrow-right"></i> Выйти
@@ -83,7 +101,6 @@
         </div>
     </nav>
 
-    <!-- Сообщения Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="container mt-3">
@@ -97,20 +114,18 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Основной контент -->
     <main class="py-4">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Подвал -->
     <footer class="bg-dark-green text-white py-4 mt-auto">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
-                    <h5>🦫 Three Beavers Cafe</h5>
+                <div class="col-md-6">
+                    <h5>🐿 Three Beavers Cafe</h5>
                     <p>Уютное кафе с авторской кухней<br>и атмосферой лесного домика</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <h5>Контакты</h5>
                     <p>
                         <i class="bi bi-geo-alt"></i> ул. Пушкина, д. Колотушкина<br>
@@ -118,21 +133,12 @@
                         <i class="bi bi-clock"></i> Пн-Вс: 10:00 - 23:00
                     </p>
                 </div>
-                <div class="col-md-4">
-                    <h5>Мы в соцсетях</h5>
-                    <!-- Только Telegram -->
-                    <a href="#" class="text-white me-2"
-                    onclick="alert('Шишь вам с маслом, ТГ заблокирован в РФ'); return false;">
-                        <i class="bi bi-telegram fs-4"></i>
-                    </a>
-                </div>
             </div>
             <hr>
-            <p class="text-center mb-0">&copy; 2026 Three Beavers Cafe. Все права защищены.</p>
+            <p class="text-center mb-0">&copy; 2026 Кафе "Три Бобра". Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>

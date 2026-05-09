@@ -10,6 +10,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    avatar = db.Column(db.String(300), default='default-avatar.png')
+    
     cart_items = db.relationship('CartItem', backref='user', lazy=True)
     orders = db.relationship('Order', backref='user', lazy=True)
     bookings = db.relationship('Booking', backref='user', lazy=True)
@@ -45,7 +47,6 @@ class Order(db.Model):
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
     items = db.relationship('OrderItem', backref='order', lazy=True)
 
 class OrderItem(db.Model):
@@ -60,8 +61,10 @@ class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=False)
-    guests = db.Column(db.Integer, nullable=False)
+    time_from = db.Column(db.Time, nullable=False)
+    time_to = db.Column(db.Time, nullable=False)
+    table_number = db.Column(db.Integer, nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
     special_requests = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

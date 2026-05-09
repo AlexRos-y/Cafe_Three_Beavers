@@ -25,6 +25,7 @@ def create_app():
     from routes.booking import booking_bp
     from routes.reviews import reviews_bp
     from routes.main import main_bp
+    from routes.admin import admin_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(menu_bp)
@@ -33,6 +34,15 @@ def create_app():
     app.register_blueprint(booking_bp)
     app.register_blueprint(reviews_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(admin_bp)
+    
+    @app.context_processor
+    def inject_cart_count():
+        from flask_login import current_user
+        cart_count = 0
+        if current_user.is_authenticated:
+            cart_count = sum(item.quantity for item in current_user.cart_items)
+        return {'cart_count': cart_count}
     
     with app.app_context():
         db.create_all()

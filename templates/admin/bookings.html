@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Брони - Админ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-2"><i class="bi bi-calendar-check"></i> Все бронирования</h1>
+
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-grid"></i> Дашборд</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.orders') }}"><i class="bi bi-box"></i> Заказы</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.bookings') }}"><i class="bi bi-calendar-check"></i> Брони</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.menu') }}"><i class="bi bi-menu-button-wide"></i> Меню</a></li>
+    </ul>
+
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+            <thead class="table-dark">
+                <tr><th>#</th><th>Дата</th><th>Время</th><th>Гость</th><th>Столик</th><th>Телефон</th><th>Статус</th><th>Действие</th></tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>#{{ b.id }}</td>
+                    <td>{{ b.date.strftime('%d.%m.%Y') }}</td>
+                    <td>{{ b.time_from }}–{{ b.time_to }}</td>
+                    <td>{{ b.user.username }}</td>
+                    <td>№{{ b.table_number }}</td>
+                    <td>{{ b.phone }}</td>
+                    <td><span class="badge bg-{% if b.status=='pending' %}warning{% elif b.status=='confirmed' %}success{% elif b.status=='cancelled' %}danger{% else %}secondary{% endif %}">{{ b.status }}</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.update_booking_status', booking_id=b.id) }}" class="d-flex gap-1">
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="pending" {% if b.status=='pending' %}selected{% endif %}>pending</option>
+                                <option value="confirmed" {% if b.status=='confirmed' %}selected{% endif %}>confirmed</option>
+                                <option value="cancelled" {% if b.status=='cancelled' %}selected{% endif %}>cancelled</option>
+                                <option value="completed" {% if b.status=='completed' %}selected{% endif %}>completed</option>
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

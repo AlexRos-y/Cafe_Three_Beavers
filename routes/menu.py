@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from flask_login import current_user
 from models import MenuItem, Category
 
 menu_bp = Blueprint('menu', __name__)
@@ -13,4 +14,8 @@ def menu():
         items = MenuItem.query.filter_by(available=True).all()
     
     categories = Category.query.all()
-    return render_template('menu.html', items=items, categories=categories)
+    cart_count = 0
+    if current_user.is_authenticated:
+        cart_count = sum(item.quantity for item in current_user.cart_items)
+    
+    return render_template('menu.html', items=items, categories=categories, cart_count=cart_count)

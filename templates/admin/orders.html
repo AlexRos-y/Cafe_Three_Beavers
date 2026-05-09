@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы - Админ{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-2"><i class="bi bi-box"></i> Все заказы</h1>
+
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-grid"></i> Дашборд</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.orders') }}"><i class="bi bi-box"></i> Заказы</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.bookings') }}"><i class="bi bi-calendar-check"></i> Брони</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.menu') }}"><i class="bi bi-menu-button-wide"></i> Меню</a></li>
+    </ul>
+
+    <!-- Фильтр -->
+    <div class="btn-group mb-3">
+        <a href="?status=all" class="btn btn-sm {% if current_filter=='all' %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
+        {% for s in statuses %}
+        <a href="?status={{ s }}" class="btn btn-sm {% if current_filter==s %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ s }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+            <thead class="table-dark">
+                <tr><th>#</th><th>Дата</th><th>Пользователь</th><th>Адрес</th><th>Сумма</th><th>Статус</th><th>Действие</th></tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td>{{ o.created_at.strftime('%d.%m %H:%M') }}</td>
+                    <td>{{ o.user.username }}</td>
+                    <td>{{ o.delivery_address[:30] }}...</td>
+                    <td>{{ o.total_price }} ₽</td>
+                    <td><span class="badge bg-{% if o.status=='new' %}warning{% elif o.status=='delivered' %}success{% elif o.status=='cancelled' %}danger{% else %}info{% endif %}">{{ o.status }}</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.update_order_status', order_id=o.id) }}" class="d-flex gap-1">
+                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                {% for s in statuses %}
+                                <option value="{{ s }}" {% if o.status==s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
