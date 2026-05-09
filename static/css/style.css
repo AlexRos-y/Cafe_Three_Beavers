@@ -1,0 +1,119 @@
+/* Цветовая схема Three Beavers */
+:root {
+    --beaver-green: #2d5a27;
+    --beaver-dark: #1a3a17;
+    --beaver-light: #4a7c43;
+    --beaver-gold: #c4a35a;
+    --beaver-cream: #f5f0e8;
+    --beaver-brown: #6b4f3c;
+}
+
+/* Фон */
+.bg-dark-green {
+    background-color: var(--beaver-dark) !important;
+}
+
+.text-dark-green {
+    color: var(--beaver-dark);
+}
+
+/* Кнопки */
+.btn-primary {
+    background-color: var(--beaver-green);
+    border-color: var(--beaver-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--beaver-dark);
+    border-color: var(--beaver-dark);
+}
+
+.btn-outline-primary {
+    color: var(--beaver-green);
+    border-color: var(--beaver-green);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--beaver-green);
+    border-color: var(--beaver-green);
+}
+
+/* Карточки */
+.card {
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Иконки преимуществ */
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* Навигация */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--beaver-gold) !important;
+}
+
+/* Подвал */
+footer {
+    background-color: var(--beaver-dark);
+}
+
+footer a {
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: var(--beaver-gold) !important;
+}
+
+/* Общие стили */
+body {
+    background-color: var(--beaver-cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Рейтинг звезды */
+.star-rating {
+    color: var(--beaver-gold);
+    font-size: 24px;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--beaver-cream);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--beaver-green);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--beaver-dark);
+}

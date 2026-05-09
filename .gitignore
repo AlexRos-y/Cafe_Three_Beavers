@@ -1,2 +1,30 @@
+# Виртуальное окружение
 venv/
+env/
+.env
+
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Flask
+instance/
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# API keys (если вынесем в отдельный файл)
+.env

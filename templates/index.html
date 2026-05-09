@@ -1,44 +1,104 @@
 {% extends "base.html" %}
 
-{% block title %}Главная - Кафе "Три Бобра"{% endblock %}
+{% block title %}Three Beavers Cafe - Главная{% endblock %}
 
 {% block content %}
-<div class="text-center mb-5">
-    <h1 class="display-4">Добро пожаловать в кафе "Три Бобра"!</h1>
-    <p class="lead">Уютное кафе с домашней кухней и атмосферой лесного домика</p>
-    <a href="{{ url_for('menu.menu_list') }}" class="btn btn-danger btn-lg">Смотреть меню</a>
-    <a href="{{ url_for('booking.book_table') }}" class="btn btn-outline-danger btn-lg">Забронировать столик</a>
-</div>
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-dark-green">Добро пожаловать в Three Beavers Cafe!</h1>
+            <p class="lead">Уютное место с авторской кухней, где каждый гость чувствует себя как дома. Попробуйте наши фирменные блюда и насладитесь атмосферой лесного домика.</p>
+            <div class="mt-4">
+                <a href="{{ url_for('menu.menu') }}" class="btn btn-primary btn-lg me-2">
+                    <i class="bi bi-menu-button-wide"></i> Смотреть меню
+                </a>
+                <a href="{{ url_for('booking.booking') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-calendar-check"></i> Забронировать столик
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <div class="hero-image">
+                <span style="font-size: 200px;">🦫🏠☕</span>
+            </div>
+        </div>
+    </div>
 
-<div class="row mb-5">
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h3>🍲 Домашняя кухня</h3>
-                <p>Только свежие продукты и рецепты, проверенные временем</p>
+    <!-- Преимущества -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="feature-icon">🌿</div>
+                    <h5 class="card-title">Свежие продукты</h5>
+                    <p class="card-text">Используем только натуральные ингредиенты от местных фермеров</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="feature-icon">👨‍🍳</div>
+                    <h5 class="card-title">Авторская кухня</h5>
+                    <p class="card-text">Уникальные рецепты от нашего шеф-повара с многолетним опытом</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="feature-icon">🏡</div>
+                    <h5 class="card-title">Уютная атмосфера</h5>
+                    <p class="card-text">Интерьер в стиле лесного домика с камином и живой музыкой</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h3>🪵 Уютный интерьер</h3>
-                <p>Деревянная мебель, камин и живая музыка по вечерам</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <h3>🚗 Доставка</h3>
-                <p>Быстрая доставка по городу. Отслеживайте заказ на карте!</p>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="text-center">
-    <h2>Популярные блюда</h2>
-    <p>Загружаются из меню...</p>
+    <!-- Популярные блюда -->
+    <h2 class="text-center mb-4">Популярные блюда</h2>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <span style="font-size: 60px;">🥩</span>
+                    <h5 class="card-title">Стейк из лосося</h5>
+                    <p class="text-muted">С овощами гриль</p>
+                    <p class="fw-bold text-primary">1 200 ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <span style="font-size: 60px;">🍝</span>
+                    <h5 class="card-title">Паста Карбонара</h5>
+                    <p class="text-muted">С беконом и пармезаном</p>
+                    <p class="fw-bold text-primary">850 ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <span style="font-size: 60px;">🥗</span>
+                    <h5 class="card-title">Цезарь с курицей</h5>
+                    <p class="text-muted">Классический рецепт</p>
+                    <p class="fw-bold text-primary">650 ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <span style="font-size: 60px;">🍰</span>
+                    <h5 class="card-title">Чизкейк Нью-Йорк</h5>
+                    <p class="text-muted">С ягодным соусом</p>
+                    <p class="fw-bold text-primary">450 ₽</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
