@@ -17,7 +17,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark-green sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                🦫 Three Beavers Cafe
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top me-2" onerror="this.style.display='none'">
+                Three Beavers Cafe
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -112,20 +113,22 @@
                 <div class="col-md-4">
                     <h5>Контакты</h5>
                     <p>
-                        <i class="bi bi-geo-alt"></i> ул. Лесная, 13<br>
-                        <i class="bi bi-telephone"></i> +7 (999) 123-45-67<br>
+                        <i class="bi bi-geo-alt"></i> ул. Пушкина, д. Колотушкина<br>
+                        <i class="bi bi-telephone"></i> +7 (999) 888-77-66<br>
                         <i class="bi bi-clock"></i> Пн-Вс: 10:00 - 23:00
                     </p>
                 </div>
                 <div class="col-md-4">
                     <h5>Мы в соцсетях</h5>
-                    <a href="#" class="text-white me-2"><i class="bi bi-telegram fs-4"></i></a>
-                    <a href="#" class="text-white me-2"><i class="bi bi-instagram fs-4"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-whatsapp fs-4"></i></a>
+                    <!-- Только Telegram -->
+                    <a href="#" class="text-white me-2"
+                    onclick="alert('Шишь вам с маслом, ТГ заблокирован в РФ'); return false;">
+                        <i class="bi bi-telegram fs-4"></i>
+                    </a>
                 </div>
             </div>
             <hr>
-            <p class="text-center mb-0">&copy; 2024 Three Beavers Cafe. Все права защищены.</p>
+            <p class="text-center mb-0">&copy; 2026 Three Beavers Cafe. Все права защищены.</p>
         </div>
     </footer>
 

@@ -7,39 +7,59 @@
     <h1 class="text-center mb-2">Наше меню</h1>
     <p class="text-center text-muted mb-4">Авторские блюда из свежих продуктов</p>
     
-    <!-- Фильтры по категориям (пока статичные, позже сделаем динамику) -->
+    <!-- Фильтры по категориям -->
     <div class="row mb-4">
         <div class="col">
             <nav class="nav nav-pills justify-content-center flex-wrap gap-2">
-                <a class="nav-link active" href="#">Все</a>
-                <a class="nav-link" href="#">Горячие блюда</a>
-                <a class="nav-link" href="#">Салаты</a>
-                <a class="nav-link" href="#">Супы</a>
-                <a class="nav-link" href="#">Десерты</a>
-                <a class="nav-link" href="#">Напитки</a>
+                <a class="nav-link {% if not request.args.get('category') %}active{% endif %}" 
+                   href="{{ url_for('menu.menu') }}">Все</a>
+                {% for category in categories %}
+                <a class="nav-link {% if request.args.get('category')|int == category.id %}active{% endif %}" 
+                   href="{{ url_for('menu.menu', category=category.id) }}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
             </nav>
         </div>
     </div>
     
     <!-- Карточки блюд -->
     <div class="row g-4">
-        {% for i in range(8) %}
-        <div class="col-md-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                    <span style="font-size: 64px;">🍽️</span>
-                    <h5 class="card-title mt-2">Название блюда</h5>
-                    <p class="card-text text-muted small">Краткое описание блюда и его состав</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="fw-bold text-primary fs-5">999 ₽</span>
-                        <button class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-cart-plus"></i> В корзину
-                        </button>
+        {% if items %}
+            {% for item in items %}
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <!-- Изображение блюда -->
+                    <img src="{{ url_for('static', filename='images/menu/' + item.image_url) }}" 
+                         class="card-img-top" alt="{{ item.name }}"
+                         style="height: 200px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <!-- Категория -->
+                        <span class="badge bg-secondary mb-2">{{ item.category.name }}</span>
+                        
+                        <h5 class="card-title mt-1">{{ item.name }}</h5>
+                        <p class="card-text text-muted small">{{ item.description }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="fw-bold text-primary fs-5">{{ item.price }} ₽</span>
+                            <button class="btn btn-sm btn-outline-primary add-to-cart" data-id="{{ item.id }}">
+                                <i class="bi bi-cart-plus"></i> В корзину
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <img src="{{ url_for('static', filename='images/empty-menu.svg') }}" 
+                     alt="Пустое меню" 
+                     style="width: 200px;"
+                     onerror="this.style.display='none'">
+                <h3 class="mt-3">Меню пока пустое</h3>
+                <p class="text-muted">Скоро мы добавим блюда</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
