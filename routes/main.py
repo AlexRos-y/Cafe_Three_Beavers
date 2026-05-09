@@ -6,6 +6,5 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    # Популярные блюда — первые 4 доступных из БД
     popular_items = MenuItem.query.filter_by(available=True).limit(4).all()
     return render_template('index.html', popular_items=popular_items)

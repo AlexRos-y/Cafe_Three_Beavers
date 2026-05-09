@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from functools import wraps
-from models import db, User, Order, Booking, MenuItem, Category, Review
+from models import db, User, Order, OrderItem, Booking, MenuItem, Category, Review
 from datetime import datetime, date
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -17,7 +17,6 @@ def admin_required(f):
     return decorated_function
 
 
-# ==================== ДАШБОРД ====================
 @admin_bp.route('/')
 @login_required
 @admin_required
@@ -43,7 +42,6 @@ def dashboard():
                          today=today)
 
 
-# ==================== ЗАКАЗЫ ====================
 @admin_bp.route('/orders')
 @login_required
 @admin_required
@@ -78,7 +76,6 @@ def update_order_status(order_id):
     return redirect(url_for('admin.orders'))
 
 
-# ==================== БРОНИ ====================
 @admin_bp.route('/bookings')
 @login_required
 @admin_required
@@ -121,7 +118,7 @@ def update_booking_status(booking_id):
     return redirect(url_for('admin.bookings'))
 
 
-# ==================== МЕНЮ ====================
+
 @admin_bp.route('/menu')
 @login_required
 @admin_required
@@ -204,3 +201,25 @@ def toggle_menu_item(item_id):
     status = 'доступно' if item.available else 'скрыто'
     flash(f'Блюдо «{item.name}» теперь {status}', 'info')
     return redirect(url_for('admin.menu'))
+
+@admin_bp.route('/orders/<int:order_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    OrderItem.query.filter_by(order_id=order.id).delete()
+    db.session.delete(order)
+    db.session.commit()
+    flash(f'Заказ #{order_id} удалён!', 'info')
+    return redirect(url_for('admin.orders'))
+
+
+@admin_bp.route('/bookings/<int:booking_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    flash(f'Бронь #{booking_id} удалена!', 'info')
+    return redirect(url_for('admin.bookings'))

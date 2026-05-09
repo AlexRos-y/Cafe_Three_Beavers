@@ -5,7 +5,6 @@ from datetime import datetime, date, time
 
 booking_bp = Blueprint('booking', __name__)
 
-# Схема столиков
 TABLES = {
     1: {'name': 'Столик 1', 'seats': 2, 'location': 'У окна', 'row': 0, 'col': 0},
     2: {'name': 'Столик 2', 'seats': 2, 'location': 'У окна', 'row': 0, 'col': 1},
@@ -20,15 +19,12 @@ TABLES = {
 
 
 def get_ascii_map(booked_tables):
-    """Генерирует ASCII-схему с отметками занятости"""
-    # Сетка зала: 3 строки × 4 колонки
     grid = [
         ['[1]', '[2]', '[3]', '[4]'],
         ['[5]', '   ', '[7]', '[8]'],
         ['[6]', '   ', '[9]', '   '],
     ]
     
-    # Отмечаем занятые
     result_grid = []
     for r in range(3):
         row = []
@@ -51,22 +47,22 @@ def get_ascii_map(booked_tables):
 │ ┌─────────┐  ┌────────┐  ┌──────────┐ ┌──────────┐      │
 │ │ Стол 1  │  │ Стол 2 │  │ Стол 3   │ │ Стол 4   │      │
 │ │  2 мест │  │  2 мест│  │  4 места │ │  4 места │      │
-│ │ {result_grid[0][0]}     │  │  {result_grid[0][1]}   │  │  {result_grid[0][2]}     │ │  {result_grid[0][3]}     │      │
+│ │         |  |        |  |          | |          |      |
 │ └─────────┘  └────────┘  └──────────┘ └──────────┘      │
 │                                                         │
 │ ┌─────────────────────┐              ┌─────────────────┐│
 │ │     Стол 5          │              │    БАРНАЯ       ││
 │ │     6 мест          │              │ ┌──────┐ ┌────┐ ││
 │ │    (У КАМИНА)       │              │ │Стол 7│ │Ст 8│ ││
-│ │      {result_grid[1][0]}            │              │ │  {result_grid[1][2]} │ │ {result_grid[1][3]}│ ││
+│ │                     |              | |      | |    | ||
 │ └─────────────────────┘              │ └──────┘ └────┘ ││
 │                                      └─────────────────┘│
 │ ┌─────────────────────┐                                 │
 │ │     Стол 6          │    ┌──────────────────┐         │
 │ │     6 мест          │    │    VIP-КАБИНА    │         │
 │ │    (У КАМИНА)       │    │    Стол 9        │         │
-│ │      {result_grid[2][0]}            │    │    8 мест        │         │
-│ └─────────────────────┘    │      {result_grid[2][2]}         │         │
+│ │                     │    │    8 мест        │         │
+│ └─────────────────────┘    │                  │         │
 │                            └──────────────────┘         │
 └─────────────────────────────────────────────────────────┘
     """
@@ -83,16 +79,12 @@ def booking():
         table_number = request.form.get('table_number', type=int)
         phone = request.form.get('phone')
         special_requests = request.form.get('special_requests', '')
-        
-        # Валидация
         errors = []
         
         if not booking_date:
             errors.append('Выберите дату')
         else:
             booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d').date()
-            if booking_date_obj < date.today():
-                errors.append('Нельзя забронировать на прошедшую дату')
         
         if not time_from or not time_to:
             errors.append('Выберите время')
@@ -109,7 +101,6 @@ def booking():
                 flash(error, 'danger')
             return redirect(url_for('booking.booking'))
         
-        # Проверка на занятость
         time_from_obj = datetime.strptime(time_from, '%H:%M').time()
         time_to_obj = datetime.strptime(time_to, '%H:%M').time()
         
@@ -142,7 +133,6 @@ def booking():
         flash(f'Столик №{table_number} успешно забронирован на {booking_date} с {time_from} до {time_to}!', 'success')
         return redirect(url_for('booking.my_bookings'))
     
-    # GET — показываем свободные/занятые столики
     today = date.today()
     bookings_today = Booking.query.filter(
         Booking.date == today,

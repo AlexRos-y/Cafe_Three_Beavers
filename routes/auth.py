@@ -17,13 +17,11 @@ def avatar(user_id):
     """Отдаёт аватар пользователя"""
     user = User.query.get_or_404(user_id)
     
-    # Если есть загруженный аватар — отдаём его
     if user.avatar and user.avatar != 'default-avatar.png':
         avatar_path = os.path.join(current_app.static_folder, 'uploads', 'avatars', user.avatar)
         if os.path.exists(avatar_path):
             return send_file(avatar_path)
     
-    # Генерируем аватар с буквой
     first_letter = user.username[0].upper() if user.username else '?'
     
     colors = {
@@ -44,11 +42,9 @@ def avatar(user_id):
     size = 150
     img = Image.new('RGB', (size, size), color=bg_color)
     draw = ImageDraw.Draw(img)
-    
-    # Круг
+
     draw.ellipse([0, 0, size-1, size-1], fill=bg_color)
-    
-    # Шрифт
+
     try:
         font = ImageFont.truetype("arial.ttf", 70)
     except:
@@ -59,8 +55,7 @@ def avatar(user_id):
                 font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 70)
             except:
                 font = ImageFont.load_default()
-    
-    # Центрируем букву
+
     bbox = draw.textbbox((0, 0), first_letter, font=font)
     w = bbox[2] - bbox[0]
     h = bbox[3] - bbox[1]

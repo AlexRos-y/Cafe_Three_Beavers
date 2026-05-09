@@ -118,7 +118,6 @@ main {
     background: var(--beaver-dark);
 }
 
-/* Анимация добавления в корзину */
 .add-to-cart-ajax.btn-success {
     transition: all 0.3s ease;
 }
@@ -144,7 +143,6 @@ main {
     color: #000 !important;
 }
 
-/* Если бейдж скрыт — даём Bootstrap'овскому .d-none приоритет */
 #cart-count.d-none {
     display: none !important;
 }

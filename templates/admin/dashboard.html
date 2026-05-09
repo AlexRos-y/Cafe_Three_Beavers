@@ -7,7 +7,6 @@
     <h1 class="mb-2"><i class="bi bi-speedometer2"></i> Админ-панель</h1>
     <p class="text-muted mb-4">Добро пожаловать, {{ current_user.username }}!</p>
 
-    <!-- Навигация -->
     <ul class="nav nav-pills mb-4">
         <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-grid"></i> Дашборд</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.orders') }}"><i class="bi bi-box"></i> Заказы</a></li>
@@ -15,7 +14,6 @@
         <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.menu') }}"><i class="bi bi-menu-button-wide"></i> Меню</a></li>
     </ul>
 
-    <!-- Статистика -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <div class="card bg-warning text-dark shadow-sm">
@@ -40,7 +38,6 @@
     </div>
 
     <div class="row">
-        <!-- Последние заказы -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark-green text-white"><h5 class="mb-0"><i class="bi bi-box"></i> Последние заказы</h5></div>
@@ -62,7 +59,6 @@
             </div>
         </div>
 
-        <!-- Брони на сегодня -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark-green text-white"><h5 class="mb-0"><i class="bi bi-calendar-check"></i> Брони на сегодня ({{ today }})</h5></div>

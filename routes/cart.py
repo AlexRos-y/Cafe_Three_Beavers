@@ -34,10 +34,8 @@ def add_to_cart(item_id):
     
     db.session.commit()
     
-    # Считаем общее количество для ответа
     cart_count = sum(item.quantity for item in current_user.cart_items)
     
-    # Если это AJAX-запрос — возвращаем JSON
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({'status': 'ok', 'cart_count': cart_count, 'message': f'{menu_item.name} добавлен!'})
     
@@ -79,7 +77,6 @@ def remove_from_cart(item_id):
     db.session.delete(cart_item)
     db.session.commit()
     
-    # Если это AJAX-запрос — возвращаем JSON
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         cart_count = sum(item.quantity for item in current_user.cart_items)
         return jsonify({'status': 'ok', 'cart_count': cart_count})
