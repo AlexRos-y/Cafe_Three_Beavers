@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Отзывы - Three Beavers Cafe{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Левая колонка - форма отзыва -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm sticky-top" style="top: 80px;">
+                <div class="card-header bg-dark-green text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Оставить отзыв</h5>
+                </div>
+                <div class="card-body">
+                    {% if current_user.is_authenticated %}
+                    <form method="POST">
+                        <div class="mb-3 text-center">
+                            <label class="form-label">Ваша оценка</label>
+                            <div class="star-rating-input">
+                                <span class="star" data-rating="1">☆</span>
+                                <span class="star" data-rating="2">☆</span>
+                                <span class="star" data-rating="3">☆</span>
+                                <span class="star" data-rating="4">☆</span>
+                                <span class="star" data-rating="5">☆</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" rows="4" 
+                                      placeholder="Расскажите о ваших впечатлениях..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-send"></i> Отправить отзыв
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-lock" style="font-size: 40px;"></i>
+                        <p class="mt-2">Чтобы оставить отзыв, нужно войти</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">
+                            Войти
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Правая колонка - список отзывов -->
+        <div class="col-lg-8">
+            <h1 class="mb-4">Отзывы наших гостей</h1>
+            
+            <!-- Пример отзыва -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">Анна</h5>
+                            <div class="text-warning mb-2">
+                                ★★★★★
+                            </div>
+                        </div>
+                        <small class="text-muted">2 дня назад</small>
+                    </div>
+                    <p class="mb-0">Прекрасное место! Очень уютная атмосфера, вкусная еда и приветливый персонал. 
+                    Обязательно вернёмся сюда снова. Особенно понравился стейк из лосося — просто тает во рту!</p>
+                </div>
+            </div>
+            
+            <!-- Пример отзыва -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">Михаил</h5>
+                            <div class="text-warning mb-2">
+                                ★★★★☆
+                            </div>
+                        </div>
+                        <small class="text-muted">5 дней назад</small>
+                    </div>
+                    <p class="mb-0">Хорошее кафе с авторской кухней. Цены немного выше среднего, но оно того стоит. 
+                    Брал пасту карбонара — очень вкусно. Единственное, долго ждали заказ, но это был вечер пятницы.</p>
+                </div>
+            </div>
+            
+            <!-- Пример отзыва -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">Екатерина</h5>
+                            <div class="text-warning mb-2">
+                                ★★★★★
+                            </div>
+                        </div>
+                        <small class="text-muted">1 неделя назад</small>
+                    </div>
+                    <p class="mb-0">Отмечали здесь день рождения подруги. Очень понравилось обслуживание, 
+                    заранее украсили столик, принесли комплимент от шеф-повара. Чизкейк просто божественный!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
