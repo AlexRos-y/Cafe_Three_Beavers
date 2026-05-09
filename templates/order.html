@@ -5,8 +5,15 @@
 {% block extra_css %}
 <style>
     #map {
-        height: 400px;
+        height: 500px;
         border-radius: 15px;
+    }
+    .delivery-badge {
+        background: #2d5a27;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
     }
 </style>
 {% endblock %}
@@ -15,74 +22,93 @@
 <div class="container">
     <h1 class="mb-4">Оформление заказа</h1>
     
-    <div class="row">
-        <!-- Левая колонка - состав заказа -->
-        <div class="col-lg-5 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark-green text-white">
-                    <h5 class="mb-0"><i class="bi bi-bag"></i> Ваш заказ</h5>
+    <form method="POST" id="order-form">
+        <div class="row">
+            <!-- Левая колонка - состав заказа -->
+            <div class="col-lg-5 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark-green text-white">
+                        <h5 class="mb-0"><i class="bi bi-bag"></i> Ваш заказ</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for item in cart_items %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <div>
+                                <span>{{ item.menu_item.name }}</span>
+                                <span class="text-muted">× {{ item.quantity }}</span>
+                            </div>
+                            <span>{{ item.menu_item.price * item.quantity }} ₽</span>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Доставка</span>
+                            <span class="delivery-badge">Бесплатно</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Итого:</span>
+                            <span class="text-primary">{{ total }} ₽</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Блюдо 1 × 2</span>
-                        <span>1 200 ₽</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Блюдо 2 × 1</span>
-                        <span>850 ₽</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between fw-bold fs-5">
-                        <span>Итого:</span>
-                        <span class="text-primary">2 050 ₽</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Форма заказа -->
-            <div class="card shadow-sm mt-3">
-                <div class="card-body">
-                    <form method="POST">
+                
+                <!-- Форма заказа -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">
                                 <i class="bi bi-geo-alt"></i> Адрес доставки
                             </label>
-                            <input type="text" id="address" class="form-control" 
-                                   placeholder="Укажите адрес или выберите на карте">
+                            <input type="text" id="address" name="delivery_address" 
+                                   class="form-control" 
+                                   placeholder="Кликните по карте или введите адрес" required>
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> 
+                                Кликните по карте — адрес подставится автоматически
+                            </small>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">
                                 <i class="bi bi-chat-dots"></i> Комментарий к заказу
                             </label>
-                            <textarea class="form-control" rows="2" 
+                            <textarea class="form-control" name="comment" rows="2" 
                                       placeholder="Особые пожелания..."></textarea>
                         </div>
                         
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="bi bi-check-circle"></i> Оформить заказ
                         </button>
-                    </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Правая колонка - карта -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark-green text-white">
+                        <h5 class="mb-0"><i class="bi bi-map"></i> Выберите адрес на карте</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map"></div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <small>
+                            <i class="bi bi-hand-index"></i> 
+                            <strong>Кликните по карте</strong> — метка переместится, а адрес автоматически появится в поле
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Правая колонка - карта -->
-        <div class="col-lg-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark-green text-white">
-                    <h5 class="mb-0"><i class="bi bi-map"></i> Выберите адрес на карте</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div id="map"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://api-maps.yandex.ru/2.1/?apikey=f3a0fe3a-b07e-4840-a1da-06f18b2ddf13&lang=ru_RU" type="text/javascript"></script>
+<script src="https://api-maps.yandex.ru/2.1/?apikey=7f9cd07c-0f26-4523-9f72-e4b7542a45d5&lang=ru_RU" type="text/javascript"></script>
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}

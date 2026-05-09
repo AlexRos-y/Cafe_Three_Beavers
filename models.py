@@ -50,7 +50,7 @@ class Order(db.Model):
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id', ondelete='CASCADE'), nullable=False)
     menu_item_id = db.Column(db.Integer, db.ForeignKey('menu_item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price_per_unit = db.Column(db.Float, nullable=False)

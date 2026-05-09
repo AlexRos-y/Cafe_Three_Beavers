@@ -6,7 +6,82 @@
 <div class="container">
     <h1 class="mb-4">Корзина</h1>
     
-    <!-- Пока пустая корзина -->
+    {% if cart_items %}
+    <div class="row">
+        <!-- Список товаров -->
+        <div class="col-lg-8">
+            {% for item in cart_items %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <img src="{{ url_for('static', filename='images/menu/' + item.menu_item.image_url) }}"
+                                 class="img-fluid rounded" alt="{{ item.menu_item.name }}">
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="mb-1">{{ item.menu_item.name }}</h5>
+                            <span class="badge bg-secondary">{{ item.menu_item.category.name }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group input-group-sm">
+                                <button class="btn btn-outline-secondary update-qty" 
+                                        data-id="{{ item.id }}" data-action="decrease">−</button>
+                                <input type="text" class="form-control text-center qty-input" 
+                                       value="{{ item.quantity }}" data-id="{{ item.id }}" readonly>
+                                <button class="btn btn-outline-secondary update-qty" 
+                                        data-id="{{ item.id }}" data-action="increase">+</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <span class="fw-bold">{{ item.menu_item.price * item.quantity }} ₽</span>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <form method="POST" action="{{ url_for('cart.remove_from_cart', item_id=item.id) }}" 
+                                  style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Итого -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 80px;">
+                <div class="card-header bg-dark-green text-white">
+                    <h5 class="mb-0"><i class="bi bi-calculator"></i> Итого</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Товары ({{ cart_items|length }})</span>
+                        <span id="cart-total">{{ total }} ₽</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Доставка</span>
+                        <span>Бесплатно</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                        <span>К оплате</span>
+                        <span id="cart-grand-total" class="text-primary">{{ total }} ₽</span>
+                    </div>
+                    <a href="{{ url_for('orders.order') }}" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle"></i> Оформить заказ
+                    </a>
+                    <a href="{{ url_for('menu.menu') }}" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-arrow-left"></i> Продолжить выбор
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Пустая корзина -->
     <div class="card shadow-sm">
         <div class="card-body text-center py-5">
             <span style="font-size: 80px;">🛒</span>
@@ -17,7 +92,10 @@
             </a>
         </div>
     </div>
-    
-    <!-- Здесь позже будет список товаров и кнопка оформления заказа -->
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 {% endblock %}
