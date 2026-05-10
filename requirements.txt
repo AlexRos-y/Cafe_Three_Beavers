@@ -5,3 +5,4 @@ Flask-WTF
 email-validator
 Werkzeug
 Pillow
+gunicorn
