@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from functools import wraps
 from models import db, User, Order, OrderItem, Booking, MenuItem, Category, Review
 from datetime import datetime, date
-from werkzeug.utils import secure_filename
 import os
 import uuid
 
@@ -17,6 +16,7 @@ def admin_required(f):
             flash('Доступ запрещён! Только для администраторов.', 'danger')
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -25,7 +25,7 @@ def admin_required(f):
 @admin_required
 def dashboard():
     today = date.today()
-    
+
     stats = {
         'new_orders': Order.query.filter_by(status='new').count(),
         'active_orders': Order.query.filter(Order.status.in_(['new', 'preparing', 'ready'])).count(),
@@ -34,15 +34,15 @@ def dashboard():
         'total_users': User.query.count(),
         'total_menu': MenuItem.query.count(),
     }
-    
+
     recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
     today_bookings = Booking.query.filter_by(date=today).order_by(Booking.time_from).all()
-    
-    return render_template('admin/dashboard.html', 
-                         stats=stats,
-                         recent_orders=recent_orders,
-                         today_bookings=today_bookings,
-                         today=today)
+
+    return render_template('admin/dashboard.html',
+                           stats=stats,
+                           recent_orders=recent_orders,
+                           today_bookings=today_bookings,
+                           today=today)
 
 
 @admin_bp.route('/orders')
@@ -50,18 +50,18 @@ def dashboard():
 @admin_required
 def orders():
     status_filter = request.args.get('status', 'all')
-    
+
     query = Order.query.order_by(Order.created_at.desc())
     if status_filter != 'all':
         query = query.filter_by(status=status_filter)
-    
+
     all_orders = query.all()
     statuses = ['new', 'preparing', 'ready', 'delivered', 'cancelled']
-    
-    return render_template('admin/orders.html', 
-                         orders=all_orders, 
-                         current_filter=status_filter,
-                         statuses=statuses)
+
+    return render_template('admin/orders.html',
+                           orders=all_orders,
+                           current_filter=status_filter,
+                           statuses=statuses)
 
 
 @admin_bp.route('/orders/<int:order_id>/status', methods=['POST'])
@@ -70,12 +70,12 @@ def orders():
 def update_order_status(order_id):
     order = Order.query.get_or_404(order_id)
     new_status = request.form.get('status')
-    
+
     if new_status in ['new', 'preparing', 'ready', 'delivered', 'cancelled']:
         order.status = new_status
         db.session.commit()
         flash(f'Статус заказа #{order.id} изменён на «{new_status}»', 'success')
-    
+
     return redirect(url_for('admin.orders'))
 
 
@@ -85,25 +85,25 @@ def update_order_status(order_id):
 def bookings():
     date_filter = request.args.get('date', '')
     status_filter = request.args.get('status', 'all')
-    
+
     query = Booking.query.order_by(Booking.date, Booking.time_from)
-    
+
     if status_filter != 'all':
         query = query.filter_by(status=status_filter)
-    
+
     if date_filter:
         filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
         query = query.filter_by(date=filter_date)
     else:
         query = query.filter(Booking.date >= date.today())
-    
+
     all_bookings = query.all()
-    
-    return render_template('admin/bookings.html', 
-                         bookings=all_bookings,
-                         current_date=date_filter,
-                         current_status=status_filter,
-                         today=date.today())
+
+    return render_template('admin/bookings.html',
+                           bookings=all_bookings,
+                           current_date=date_filter,
+                           current_status=status_filter,
+                           today=date.today())
 
 
 @admin_bp.route('/bookings/<int:booking_id>/status', methods=['POST'])
@@ -112,14 +112,13 @@ def bookings():
 def update_booking_status(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     new_status = request.form.get('status')
-    
+
     if new_status in ['pending', 'confirmed', 'cancelled', 'completed']:
         booking.status = new_status
         db.session.commit()
         flash(f'Статус брони #{booking.id} изменён на «{new_status}»', 'success')
-    
-    return redirect(url_for('admin.bookings'))
 
+    return redirect(url_for('admin.bookings'))
 
 
 @admin_bp.route('/menu')
@@ -139,7 +138,7 @@ def add_menu_item():
     description = request.form.get('description', '').strip()
     price = request.form.get('price', type=float)
     category_id = request.form.get('category_id', type=int)
-    
+
     if not name or not price or not category_id:
         flash('Заполните все обязательные поля!', 'danger')
         return redirect(url_for('admin.menu'))
@@ -154,7 +153,7 @@ def add_menu_item():
                 filepath = os.path.join(upload_folder, unique_name)
                 file.save(filepath)
                 image_url = unique_name
-    
+
     item = MenuItem(
         name=name,
         description=description,
@@ -165,7 +164,7 @@ def add_menu_item():
     )
     db.session.add(item)
     db.session.commit()
-    
+
     flash(f'Блюдо «{name}» добавлено в меню!', 'success')
     return redirect(url_for('admin.menu'))
 
@@ -175,7 +174,7 @@ def add_menu_item():
 @admin_required
 def edit_menu_item(item_id):
     item = MenuItem.query.get_or_404(item_id)
-    
+
     item.name = request.form.get('name', '').strip()
     item.description = request.form.get('description', '').strip()
     item.price = request.form.get('price', type=float)
@@ -195,9 +194,9 @@ def edit_menu_item(item_id):
                     old_path = os.path.join(upload_folder, item.image_url)
                     if os.path.exists(old_path):
                         os.remove(old_path)
-                
+
                 item.image_url = unique_name
-    
+
     db.session.commit()
     flash(f'Блюдо «{item.name}» обновлено!', 'success')
     return redirect(url_for('admin.menu'))
@@ -225,6 +224,7 @@ def toggle_menu_item(item_id):
     status = 'доступно' if item.available else 'скрыто'
     flash(f'Блюдо «{item.name}» теперь {status}', 'info')
     return redirect(url_for('admin.menu'))
+
 
 @admin_bp.route('/orders/<int:order_id>/delete', methods=['POST'])
 @login_required

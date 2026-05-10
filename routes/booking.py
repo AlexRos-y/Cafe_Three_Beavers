@@ -24,7 +24,7 @@ def get_ascii_map(booked_tables):
         ['[5]', '   ', '[7]', '[8]'],
         ['[6]', '   ', '[9]', '   '],
     ]
-    
+
     result_grid = []
     for r in range(3):
         row = []
@@ -38,7 +38,7 @@ def get_ascii_map(booked_tables):
                     cell = '[+]'  # Свободен
             row.append(cell)
         result_grid.append(row)
-    
+
     ascii_map = f"""
 ┌─────────────────────────────────────────────────────────┐
 │                      THREE BEAVERS CAFE                 │
@@ -80,30 +80,30 @@ def booking():
         phone = request.form.get('phone')
         special_requests = request.form.get('special_requests', '')
         errors = []
-        
+
         if not booking_date:
             errors.append('Выберите дату')
         else:
             booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d').date()
-        
+
         if not time_from or not time_to:
             errors.append('Выберите время')
-        
+
         if not table_number or table_number not in TABLES:
             errors.append('Выберите столик')
-        
+
         phone_clean = phone.replace(' ', '').replace('+', '').replace('(', '').replace(')', '').replace('-', '')
         if not phone or len(phone_clean) < 11:
             errors.append('Введите корректный номер телефона')
-        
+
         if errors:
             for error in errors:
                 flash(error, 'danger')
             return redirect(url_for('booking.booking'))
-        
+
         time_from_obj = datetime.strptime(time_from, '%H:%M').time()
         time_to_obj = datetime.strptime(time_to, '%H:%M').time()
-        
+
         conflict = Booking.query.filter(
             Booking.date == booking_date_obj,
             Booking.table_number == table_number,
@@ -111,11 +111,11 @@ def booking():
             Booking.time_from < time_to_obj,
             Booking.time_to > time_from_obj
         ).first()
-        
+
         if conflict:
             flash(f'Столик №{table_number} уже забронирован на это время!', 'danger')
             return redirect(url_for('booking.booking'))
-        
+
         booking = Booking(
             user_id=current_user.id,
             date=booking_date_obj,
@@ -129,41 +129,42 @@ def booking():
         )
         db.session.add(booking)
         db.session.commit()
-        
+
         flash(f'Столик №{table_number} успешно забронирован на {booking_date} с {time_from} до {time_to}!', 'success')
         return redirect(url_for('booking.my_bookings'))
-    
+
     today = date.today()
     bookings_today = Booking.query.filter(
         Booking.date == today,
         Booking.status != 'cancelled'
     ).all()
-    
+
     now = datetime.utcnow().time()
     booked_tables = [b.table_number for b in bookings_today if b.time_from <= now <= b.time_to]
-    
+
     ascii_map = get_ascii_map(booked_tables)
-    
-    return render_template('booking.html', 
-                         tables=TABLES, 
-                         booked_tables=booked_tables, 
-                         today=today,
-                         ascii_map=ascii_map)
+
+    return render_template('booking.html',
+                           tables=TABLES,
+                           booked_tables=booked_tables,
+                           today=today,
+                           ascii_map=ascii_map)
 
 
 @booking_bp.route('/my_bookings')
 @login_required
 def my_bookings():
-    bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.date.desc(), Booking.time_from.desc()).all()
+    bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.date.desc(),
+                                                                         Booking.time_from.desc()).all()
     now = datetime.utcnow()
-    
+
     for b in bookings:
         booking_datetime = datetime.combine(b.date, b.time_to)
         if booking_datetime < now and b.status in ['pending', 'confirmed']:
             b.status = 'completed'
-    
+
     db.session.commit()
-    
+
     return render_template('my_bookings.html', bookings=bookings, tables=TABLES)
 
 
@@ -173,21 +174,21 @@ def booked_tables_api():
     date_str = request.args.get('date')
     time_from = request.args.get('time_from')
     time_to = request.args.get('time_to')
-    
+
     if not date_str or not time_from or not time_to:
         return jsonify({'error': 'Нужны date, time_from, time_to'}), 400
-    
+
     booking_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     time_from_obj = datetime.strptime(time_from, '%H:%M').time()
     time_to_obj = datetime.strptime(time_to, '%H:%M').time()
-    
+
     conflicts = Booking.query.filter(
         Booking.date == booking_date,
         Booking.status != 'cancelled',
         Booking.time_from < time_to_obj,
         Booking.time_to > time_from_obj
     ).all()
-    
+
     booked = [b.table_number for b in conflicts]
     return jsonify({'booked_tables': booked})
 
@@ -198,22 +199,22 @@ def ascii_map_api():
     date_str = request.args.get('date')
     time_from = request.args.get('time_from')
     time_to = request.args.get('time_to')
-    
+
     if not date_str or not time_from or not time_to:
         return jsonify({'error': 'Нужны date, time_from, time_to'}), 400
-    
+
     booking_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     time_from_obj = datetime.strptime(time_from, '%H:%M').time()
     time_to_obj = datetime.strptime(time_to, '%H:%M').time()
-    
+
     conflicts = Booking.query.filter(
         Booking.date == booking_date,
         Booking.status != 'cancelled',
         Booking.time_from < time_to_obj,
         Booking.time_to > time_from_obj
     ).all()
-    
+
     booked = [b.table_number for b in conflicts]
     ascii_map = get_ascii_map(booked)
-    
+
     return jsonify({'ascii_map': ascii_map, 'booked_tables': booked})

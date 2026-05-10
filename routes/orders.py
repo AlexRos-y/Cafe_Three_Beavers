@@ -5,27 +5,28 @@ from datetime import datetime
 
 orders_bp = Blueprint('orders', __name__)
 
+
 @orders_bp.route('/order', methods=['GET', 'POST'])
 @login_required
 def order():
     cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
-    
+
     if not cart_items:
         flash('Ваша корзина пуста!', 'warning')
         return redirect(url_for('cart.cart'))
-    
+
     total = sum(item.menu_item.price * item.quantity for item in cart_items)
     cart_count = sum(item.quantity for item in cart_items)
-    
+
     if request.method == 'POST':
         delivery_address = request.form.get('delivery_address')
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
-        
+
         if not delivery_address:
             flash('Укажите адрес доставки!', 'danger')
             return render_template('order.html', cart_items=cart_items, total=total, cart_count=cart_count)
-        
+
         order = Order(
             user_id=current_user.id,
             total_price=total,
@@ -37,7 +38,7 @@ def order():
         )
         db.session.add(order)
         db.session.flush()
-        
+
         for cart_item in cart_items:
             order_item = OrderItem(
                 order_id=order.id,
@@ -46,14 +47,15 @@ def order():
                 price_per_unit=cart_item.menu_item.price
             )
             db.session.add(order_item)
-        
+
         CartItem.query.filter_by(user_id=current_user.id).delete()
         db.session.commit()
-        
+
         flash('Заказ успешно оформлен! Ожидайте доставку.', 'success')
         return redirect(url_for('orders.orders'))
-    
+
     return render_template('order.html', cart_items=cart_items, total=total, cart_count=cart_count)
+
 
 @orders_bp.route('/orders')
 @login_required
