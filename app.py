@@ -17,8 +17,7 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-    
-    # Регистрация blueprints
+
     from routes.auth import auth_bp
     from routes.menu import menu_bp
     from routes.cart import cart_bp
@@ -36,8 +35,6 @@ def create_app():
     app.register_blueprint(reviews_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
-    
-    # Контекстный процессор для корзины
     @app.context_processor
     def inject_cart_count():
         from flask_login import current_user
@@ -45,8 +42,7 @@ def create_app():
         if current_user.is_authenticated:
             cart_count = sum(item.quantity for item in current_user.cart_items)
         return {'cart_count': cart_count}
-    
-    # Обработчики ошибок
+
     @app.errorhandler(404)
     def not_found_error(error):
         return render_template('errors/404.html'), 404
@@ -56,11 +52,8 @@ def create_app():
         db.session.rollback()
         return render_template('errors/500.html'), 500
     
-    with app.app_context():
-        db.create_all()
-    
     return app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

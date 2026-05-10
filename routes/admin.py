@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from functools import wraps
 from models import db, User, Order, OrderItem, Booking, MenuItem, Category, Review
 from datetime import datetime, date
+from werkzeug.utils import secure_filename
+import os
+import uuid
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -136,11 +139,21 @@ def add_menu_item():
     description = request.form.get('description', '').strip()
     price = request.form.get('price', type=float)
     category_id = request.form.get('category_id', type=int)
-    image_url = request.form.get('image_url', '').strip() or 'default-food.jpg'
     
     if not name or not price or not category_id:
         flash('Заполните все обязательные поля!', 'danger')
         return redirect(url_for('admin.menu'))
+    image_url = 'default-food.jpg'
+    if 'image' in request.files:
+        file = request.files['image']
+        if file and file.filename:
+            ext = file.filename.rsplit('.', 1)[-1].lower()
+            if ext in ['jpg', 'jpeg', 'png', 'webp']:
+                unique_name = f"{uuid.uuid4().hex}.{ext}"
+                upload_folder = os.path.join(current_app.static_folder, 'images', 'menu')
+                filepath = os.path.join(upload_folder, unique_name)
+                file.save(filepath)
+                image_url = unique_name
     
     item = MenuItem(
         name=name,
@@ -167,12 +180,23 @@ def edit_menu_item(item_id):
     item.description = request.form.get('description', '').strip()
     item.price = request.form.get('price', type=float)
     item.category_id = request.form.get('category_id', type=int)
-    
-    image = request.form.get('image_url', '').strip()
-    if image:
-        item.image_url = image
-    
     item.available = request.form.get('available') == 'on'
+
+    if 'image' in request.files:
+        file = request.files['image']
+        if file and file.filename:
+            ext = file.filename.rsplit('.', 1)[-1].lower()
+            if ext in ['jpg', 'jpeg', 'png', 'webp']:
+                unique_name = f"{uuid.uuid4().hex}.{ext}"
+                upload_folder = os.path.join(current_app.static_folder, 'images', 'menu')
+                filepath = os.path.join(upload_folder, unique_name)
+                file.save(filepath)
+                if item.image_url and item.image_url != 'default-food.jpg':
+                    old_path = os.path.join(upload_folder, item.image_url)
+                    if os.path.exists(old_path):
+                        os.remove(old_path)
+                
+                item.image_url = unique_name
     
     db.session.commit()
     flash(f'Блюдо «{item.name}» обновлено!', 'success')
