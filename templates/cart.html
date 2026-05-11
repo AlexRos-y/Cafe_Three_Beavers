@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <h1 class="mb-4">Корзина <span class="badge bg-warning text-dark ms-2">{{ cart_count }}</span></h1>
-    
+
     {% if cart_items %}
     <div class="row">
         <div class="col-lg-8">
@@ -22,22 +22,25 @@
                             <span class="badge bg-secondary">{{ item.menu_item.category.name }}</span>
                         </div>
                         <div class="col-md-3">
-                            <div class="input-group input-group-sm">
-                                <button class="btn btn-outline-secondary update-qty" 
-                                        data-id="{{ item.id }}" data-action="decrease">−</button>
-                                <input type="text" class="form-control text-center qty-input" 
-                                       value="{{ item.quantity }}" data-id="{{ item.id }}" readonly>
-                                <button class="btn btn-outline-secondary update-qty" 
-                                        data-id="{{ item.id }}" data-action="increase">+</button>
-                            </div>
+                            <form method="POST" action="{{ url_for('cart.update_cart', item_id=item.id) }}"
+                                  class="input-group input-group-sm">
+                                <button type="submit" name="action" value="decrease"
+                                        class="btn btn-outline-secondary">−
+                                </button>
+                                <input type="text" class="form-control text-center"
+                                       value="{{ item.quantity }}" readonly>
+                                <button type="submit" name="action" value="increase"
+                                        class="btn btn-outline-secondary">+
+                                </button>
+                            </form>
                         </div>
                         <div class="col-md-2 text-end">
                             <span class="fw-bold">{{ item.menu_item.price * item.quantity }} ₽</span>
                         </div>
                         <div class="col-md-1 text-end">
-                            <form method="POST" action="{{ url_for('cart.remove_from_cart', item_id=item.id) }}" 
+                            <form method="POST" action="{{ url_for('cart.remove_from_cart', item_id=item.id) }}"
                                   style="display: inline;">
-                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
                                         title="Удалить">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -48,7 +51,6 @@
             </div>
             {% endfor %}
         </div>
-        
 
         <div class="col-lg-4">
             <div class="card shadow-sm sticky-top" style="top: 80px;">
@@ -58,7 +60,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Товары ({{ cart_count }})</span>
-                        <span id="cart-total">{{ total }} ₽</span>
+                        <span>{{ total }} ₽</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Доставка</span>
@@ -67,7 +69,7 @@
                     <hr>
                     <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
                         <span>К оплате</span>
-                        <span id="cart-grand-total" class="text-primary">{{ total }} ₽</span>
+                        <span class="text-primary">{{ total }} ₽</span>
                     </div>
                     <a href="{{ url_for('orders.order') }}" class="btn btn-primary w-100">
                         <i class="bi bi-check-circle"></i> Оформить заказ
@@ -92,8 +94,4 @@
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 {% endblock %}

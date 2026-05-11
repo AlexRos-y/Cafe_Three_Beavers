@@ -12,8 +12,8 @@ def create_app():
 
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Пожалуйста, войдите для доступа к этой странице.'
+    login_manager.login_view = "auth.login"
+    login_manager.login_message = "Пожалуйста, войдите для доступа к этой странице."
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -43,20 +43,20 @@ def create_app():
         cart_count = 0
         if current_user.is_authenticated:
             cart_count = sum(item.quantity for item in current_user.cart_items)
-        return {'cart_count': cart_count}
+        return {"cart_count": cart_count}
 
     @app.errorhandler(404)
     def not_found_error(error):
-        return render_template('errors/404.html'), 404
+        return render_template("errors/404.html"), 404
 
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
-        return render_template('errors/500.html'), 500
+        return render_template("errors/500.html"), 500
 
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

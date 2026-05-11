@@ -15,29 +15,28 @@
         font-size: 13px;
         overflow-x: auto;
     }
-    .table-card {
+
+    .table-radio:checked + .table-label {
+        border-color: #2d5a27 !important;
+        background: #e8f5e9 !important;
+    }
+
+    .table-label {
         cursor: pointer;
         transition: all 0.3s;
         border: 2px solid transparent;
     }
-    .table-card:hover:not(.booked) {
+
+    .table-label:hover:not(.booked) {
         border-color: #2d5a27;
         transform: translateY(-3px);
     }
-    .table-card.selected {
-        border-color: #2d5a27 !important;
-        background: #e8f5e9 !important;
-    }
-    .table-card.booked {
+
+    .table-label.booked {
         opacity: 0.5;
         cursor: not-allowed;
         background: #fce4ec;
     }
-    .legend {
-        font-size: 14px;
-    }
-    .legend .free { color: #00ff00; }
-    .legend .busy { color: #ff4444; }
 </style>
 {% endblock %}
 
@@ -47,8 +46,10 @@
         <div class="col-lg-10">
             <h1 class="text-center mb-2">Бронь столика</h1>
             <p class="text-center text-muted mb-4">Выберите дату, время и столик</p>
-            
+
             <form method="POST" id="booking-form">
+                {{ form.hidden_tag() }}
+
                 <div class="row">
                     <div class="col-lg-5 mb-4">
                         <div class="card shadow-sm">
@@ -60,102 +61,151 @@
                                     <label class="form-label">
                                         <i class="bi bi-calendar"></i> Дата
                                     </label>
-                                    <input type="date" name="date" id="booking-date" class="form-control" 
-                                           min="{{ today }}" value="{{ today }}" required>
+                                    {{ form.date(class="form-control", min=today.strftime('%Y-%m-%d')) }}
+                                    {% if form.date.errors %}
+                                    <div class="text-danger small mt-1">{{ form.date.errors[0] }}</div>
+                                    {% endif %}
                                 </div>
+
                                 <div class="row">
                                     <div class="col-6 mb-3">
                                         <label class="form-label">С</label>
-                                        <select name="time_from" id="time-from" class="form-select" required>
+                                        <select name="time_from" class="form-select">
                                             <option value="">Выберите</option>
                                             {% for h in range(10, 23) %}
-                                                {% for m in ['00', '30'] %}
-                                                    <option value="{{ '%02d' % h }}:{{ m }}">
-                                                        {{ '%02d' % h }}:{{ m }}
-                                                    </option>
-                                                {% endfor %}
+                                            {% for m in ['00', '30'] %}
+                                            <option value="{{ '%02d' % h }}:{{ m }}">
+                                                {{ '%02d' % h }}:{{ m }}
+                                            </option>
+                                            {% endfor %}
                                             {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-6 mb-3">
                                         <label class="form-label">До</label>
-                                        <select name="time_to" id="time-to" class="form-select" required>
+                                        <select name="time_to" class="form-select">
                                             <option value="">Выберите</option>
                                             {% for h in range(10, 24) %}
-                                                {% for m in ['00', '30'] %}
-                                                    <option value="{{ '%02d' % h }}:{{ m }}">
-                                                        {{ '%02d' % h }}:{{ m }}
-                                                    </option>
-                                                {% endfor %}
+                                            {% for m in ['00', '30'] %}
+                                            <option value="{{ '%02d' % h }}:{{ m }}">
+                                                {{ '%02d' % h }}:{{ m }}
+                                            </option>
+                                            {% endfor %}
                                             {% endfor %}
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="bi bi-telephone"></i> Телефон
                                     </label>
-                                    <input type="tel" name="phone" id="phone" class="form-control" 
-                                           placeholder="+7 (___) ___-__-__" required>
+                                    {{ form.phone(class="form-control", placeholder="+7 (___) ___-__-__") }}
+                                    {% if form.phone.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone.errors[0] }}</div>
+                                    {% endif %}
+                                    <small class="text-muted">Формат: +7 (XXX) XXX-XX-XX</small>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="bi bi-chat-heart"></i> Особые пожелания
                                     </label>
-                                    <textarea class="form-control" name="special_requests" rows="2" 
-                                              placeholder="День рождения, особое меню..."></textarea>
+                                    {{ form.special_requests(class="form-control", rows="2",
+                                    placeholder="День рождения, особое меню...") }}
                                 </div>
-                                
-                                <input type="hidden" name="table_number" id="table-number" value="">
-                                
-                                <div id="selected-table-info" class="alert alert-success d-none">
-                                    <i class="bi bi-check-circle"></i> 
-                                    Выбран: <strong id="selected-table-name"></strong>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Выберите столик:</label>
+                                    <div class="row g-2">
+                                        {% for id, table in tables.items() %}
+                                        <div class="col-4">
+                                            <input type="radio" name="table_number" value="{{ id }}"
+                                                   id="table-{{ id }}" class="table-radio d-none"
+                                                   {% if id in booked_tables %}disabled{% endif %}>
+                                            <label for="table-{{ id }}"
+                                                   class="card table-label text-center py-2
+                                                   {% if id in booked_tables %}booked{% endif %}"
+                                                   style="cursor: {% if id in booked_tables %}not-allowed{% else %}pointer{% endif %}">
+                                                <strong>{{ table.name }}</strong><br>
+                                                <small class="text-muted">{{ table.location }} · {{ table.seats }}
+                                                    мест</small>
+                                                {% if id in booked_tables %}
+                                                <br><span class="badge bg-danger">Занят</span>
+                                                {% endif %}
+                                            </label>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if form.table_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.table_number.errors[0] }}</div>
+                                    {% endif %}
                                 </div>
-                                
-                                <button type="submit" class="btn btn-primary w-100" id="submit-btn" disabled>
+
+                                <button type="submit" class="btn btn-primary w-100">
                                     <i class="bi bi-calendar-check"></i> Забронировать
                                 </button>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-7">
                         <div class="card shadow-sm">
-                            <div class="card-header bg-dark-green text-white d-flex justify-content-between align-items-center">
+                            <div class="card-header bg-dark-green text-white">
                                 <h5 class="mb-0"><i class="bi bi-map"></i> Схема зала</h5>
                             </div>
                             <div class="card-body">
-                                <pre class="table-map mb-3" id="ascii-map">{{ ascii_map }}</pre>
+                                <pre class="table-map mb-3">{{ ascii_map }}</pre>
 
-                                
-                                <h6 class="mb-2">Выберите столик:</h6>
-                                <div class="row g-2" id="tables-container">
-                                    {% for id, table in tables.items() %}
-                                    <div class="col-4">
-                                        <div class="card table-card text-center py-2
-                                            {% if id in booked_tables %}booked{% endif %}"
-                                             data-table="{{ id }}"
-                                             data-name="{{ table.name }}"
-                                             data-seats="{{ table.seats }}"
-                                             data-location="{{ table.location }}">
-                                            <strong>{{ table.name }}</strong><br>
-                                            <small class="text-muted">{{ table.location }} · {{ table.seats }} мест</small>
-                                            {% if id in booked_tables %}
-                                            <br><span class="badge bg-danger">Занят</span>
-                                            {% endif %}
-                                        </div>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Проверить доступность на другую дату:</h6>
+                                        <form method="GET" action="{{ url_for('booking.booking') }}" class="row g-2">
+                                            <div class="col-4">
+                                                <input type="date" name="check_date"
+                                                       class="form-control form-control-sm"
+                                                       value="{{ check_date }}" min="{{ today.strftime('%Y-%m-%d') }}">
+                                            </div>
+                                            <div class="col-3">
+                                                <select name="check_time_from" class="form-select form-select-sm">
+                                                    {% for h in range(10, 23) %}
+                                                    {% for m in ['00', '30'] %}
+                                                    <option value="{{ '%02d' % h }}:{{ m }}"
+                                                            {% if check_time_from==
+                                                    '%02d:%s' % (h, m) %}selected{% endif %}>
+                                                    {{ '%02d' % h }}:{{ m }}
+                                                    </option>
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-3">
+                                                <select name="check_time_to" class="form-select form-select-sm">
+                                                    {% for h in range(10, 24) %}
+                                                    {% for m in ['00', '30'] %}
+                                                    <option value="{{ '%02d' % h }}:{{ m }}"
+                                                            {% if check_time_to==
+                                                    '%02d:%s' % (h, m) %}selected{% endif %}>
+                                                    {{ '%02d' % h }}:{{ m }}
+                                                    </option>
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-2">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                                                    🔄 Обновить
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
-            
+
             <div class="card shadow-sm mt-4">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -175,70 +225,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.getElementById('phone').addEventListener('input', function(e) {
-        var val = this.value.replace(/\D/g, '');
-        var formatted = '+7 ';
-        if (val.length > 1) formatted += '(' + val.substring(1, 4);
-        if (val.length >= 4) formatted += ') ' + val.substring(4, 7);
-        if (val.length >= 7) formatted += '-' + val.substring(7, 9);
-        if (val.length >= 9) formatted += '-' + val.substring(9, 11);
-        this.value = formatted;
-    });
-    
-    var tableNumberInput = document.getElementById('table-number');
-    var selectedTableInfo = document.getElementById('selected-table-info');
-    var selectedTableName = document.getElementById('selected-table-name');
-    var submitBtn = document.getElementById('submit-btn');
-    var tables = document.querySelectorAll('.table-card:not(.booked)');
-    
-    tables.forEach(function(card) {
-        card.addEventListener('click', function() {
-            tables.forEach(function(c) { c.classList.remove('selected'); });
-            this.classList.add('selected');
-            tableNumberInput.value = this.dataset.table;
-            selectedTableName.textContent = this.dataset.name + ' (' + this.dataset.location + ', ' + this.dataset.seats + ' мест)';
-            selectedTableInfo.classList.remove('d-none');
-            submitBtn.disabled = false;
-        });
-    });
-    
-    function updateMap() {
-        var date = document.getElementById('booking-date').value;
-        var tFrom = document.getElementById('time-from').value;
-        var tTo = document.getElementById('time-to').value;
-        
-        if (date && tFrom && tTo) {
-            fetch('/api/ascii_map?date=' + date + '&time_from=' + tFrom + '&time_to=' + tTo)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    document.getElementById('ascii-map').textContent = data.ascii_map;
-                    
-                    var booked = data.booked_tables;
-                    document.querySelectorAll('.table-card').forEach(function(card) {
-                        var tNum = parseInt(card.dataset.table);
-                        if (booked.includes(tNum)) {
-                            card.classList.add('booked');
-                            if (!card.querySelector('.badge')) {
-                                card.innerHTML += '<br><span class="badge bg-danger">Занят</span>';
-                            }
-                        } else {
-                            card.classList.remove('booked');
-                            var badge = card.querySelector('.badge');
-                            if (badge) badge.remove();
-                        }
-                    });
-                    
-                    tables = document.querySelectorAll('.table-card:not(.booked)');
-                });
-        }
-    }
-    
-    document.getElementById('booking-date').addEventListener('change', updateMap);
-    document.getElementById('time-from').addEventListener('change', updateMap);
-    document.getElementById('time-to').addEventListener('change', updateMap);
-</script>
 {% endblock %}
